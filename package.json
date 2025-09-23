@@ -1,0 +1,32 @@
+{
+  "name": "notes-app-backend",
+  "version": "1.0.0",
+  "description": "Backend for real-time collaborative notes app",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "prisma": "^5.7.1",
+    "@prisma/client": "^5.7.1",
+    "ws": "^8.14.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["notes", "collaborative", "realtime", "websocket"],
+  "author": "",
+  "license": "MIT"
+}
