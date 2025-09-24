@@ -1,8 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  port: process.env.PORT || 3000,
-  wsPort: process.env.WS_PORT || 8080,
+  port: process.env.PORT || 4000,
   nodeEnv: process.env.NODE_ENV || 'development',
   jwt: {
     secret: process.env.JWT_SECRET || 'fallback-secret-key',

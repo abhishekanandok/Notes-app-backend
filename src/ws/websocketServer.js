@@ -17,13 +17,18 @@ class WebSocketServer {
 
     this.wss.on('connection', (ws, req) => {
       console.log('New WebSocket connection attempt');
+      console.log('Request URL:', req.url);
+      console.log('Request headers:', req.headers);
 
       // Extract note ID from URL path
       const url = new URL(req.url, `http://${req.headers.host}`);
       const pathParts = url.pathname.split('/');
       const noteId = pathParts[pathParts.length - 1];
 
+      console.log('Extracted note ID:', noteId);
+
       if (!noteId) {
+        console.log('No note ID found, closing connection');
         ws.close(1008, 'Note ID required');
         return;
       }
@@ -32,7 +37,7 @@ class WebSocketServer {
       this.authenticateUser(ws, req, noteId);
     });
 
-    console.log(`WebSocket server running on port ${config.wsPort}`);
+    console.log(`WebSocket server initialized on path /ws/notes`);
   }
 
   async authenticateUser(ws, req, noteId) {
@@ -41,7 +46,10 @@ class WebSocketServer {
       const token = req.url.split('token=')[1]?.split('&')[0] || 
                    req.headers.authorization?.split(' ')[1];
 
+      console.log('Extracted token:', token ? 'Token present' : 'No token');
+
       if (!token) {
+        console.log('No token found, closing connection');
         ws.close(1008, 'Authentication required');
         return;
       }
