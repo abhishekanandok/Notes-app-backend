@@ -20,8 +20,8 @@ app.use(helmet());
 // CORS
 app.use(cors({
   origin: config.nodeEnv === 'production' 
-    ? ['https://yourdomain.com'] 
-    : ['http://localhost:3000', 'http://localhost:3001'],
+    ? ['https://notes-app-anand.vercel.app'] 
+    : ['http://localhost:3000', 'https://notes-app-anand.vercel.app'],
   credentials: true
 }));
 
