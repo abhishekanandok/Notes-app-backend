@@ -1,5 +1,44 @@
 const prisma = require('../config/database');
-const { verifyNoteAccess } = require('../middleware/auth');
+
+const verifyNoteAccess = async (noteId, userId) => {
+  // First check if user owns the note
+  const ownedNote = await prisma.note.findFirst({
+    where: {
+      id: noteId,
+      userId
+    }
+  });
+
+  if (ownedNote) {
+    return { note: ownedNote, userRole: 'owner' };
+  }
+
+  // Check if user has access through sharing
+  const sharedNote = await prisma.note.findFirst({
+    where: {
+      id: noteId,
+      shares: {
+        some: {
+          userId
+        }
+      }
+    },
+    include: {
+      shares: {
+        where: {
+          userId
+        }
+      }
+    }
+  });
+
+  if (sharedNote) {
+    const share = sharedNote.shares[0];
+    return { note: sharedNote, userRole: share.role };
+  }
+
+  throw new Error('Note not found or access denied');
+};
 
 const getAllNotes = async (userId) => {
   const notes = await prisma.note.findMany({
@@ -23,7 +62,7 @@ const getAllNotes = async (userId) => {
 };
 
 const getNoteById = async (id, userId) => {
-  // Use auth middleware helper for consistent access verification
+  
   const { note, userRole } = await verifyNoteAccess(id, userId);
 
   // Get additional folder info
@@ -160,6 +199,7 @@ const deleteNote = async (id, userId) => {
 };
 
 module.exports = {
+  verifyNoteAccess,
   getAllNotes,
   getNoteById,
   createNote,
