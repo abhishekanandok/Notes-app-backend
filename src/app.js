@@ -9,6 +9,8 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const noteRoutes = require('./routes/notes');
 const folderRoutes = require('./routes/folders');
+const shareRoutes = require('./routes/shares');
+const userRoutes = require('./routes/users');
 
 const app = express();
 
@@ -44,6 +46,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/folders', folderRoutes);
+app.use('/api/shares', shareRoutes);
+app.use('/api/users', userRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

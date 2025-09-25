@@ -1,4 +1,5 @@
 const prisma = require('../config/database');
+const { verifyNoteAccess } = require('../middleware/auth');
 
 const getAllNotes = async (userId) => {
   const notes = await prisma.note.findMany({
@@ -22,11 +23,12 @@ const getAllNotes = async (userId) => {
 };
 
 const getNoteById = async (id, userId) => {
-  const note = await prisma.note.findFirst({
-    where: {
-      id,
-      userId
-    },
+  // Use auth middleware helper for consistent access verification
+  const { note, userRole } = await verifyNoteAccess(id, userId);
+
+  // Get additional folder info
+  const noteWithFolder = await prisma.note.findUnique({
+    where: { id },
     include: {
       folder: {
         select: {
@@ -37,13 +39,12 @@ const getNoteById = async (id, userId) => {
     }
   });
 
-  if (!note) {
-    throw new Error('Note not found');
-  }
-
   return {
     success: true,
-    data: note
+    data: {
+      ...noteWithFolder,
+      userRole
+    }
   };
 };
 
@@ -90,16 +91,12 @@ const createNote = async (noteData, userId) => {
 const updateNote = async (id, noteData, userId) => {
   const { title, content, folderId } = noteData;
 
-  // Check if note exists and belongs to user
-  const existingNote = await prisma.note.findFirst({
-    where: {
-      id,
-      userId
-    }
-  });
+  // Use auth middleware helper for consistent access verification
+  const { note: existingNote, userRole } = await verifyNoteAccess(id, userId);
 
-  if (!existingNote) {
-    throw new Error('Note not found or access denied');
+  // Check if user has edit permissions
+  if (userRole === 'viewer') {
+    throw new Error('Viewer role cannot edit notes');
   }
 
   // Verify folder belongs to user if folderId is provided

@@ -19,8 +19,9 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  folders Folder[]
-  notes   Note[]
+  folders    Folder[]
+  notes      Note[]
+  noteShares NoteShare[]
 
   @@map("users")
 }
@@ -52,6 +53,22 @@ model Note {
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   folderId String?
   folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  shares   NoteShare[]
 
   @@map("notes")
+}
+
+model NoteShare {
+  id        String   @id @default(cuid())
+  noteId    String
+  userId    String
+  role      String   @default("viewer") // "viewer", "editor", "admin"
+  createdAt DateTime @default(now())
+
+  // Relations
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, userId])
+  @@map("note_shares")
 }
